@@ -1,0 +1,386 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>E-Commerce Website (includes Aria label)</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+    .skip-link { position: absolute; left: -1000px; top: auto; width: 1px; height: 1px; overflow: hidden; }
+    .skip-link:focus { position: static; width: auto; height: auto; }
+    .navbar { background: #333; padding: 10px; text-align: center; }
+    .navbar a, .navbar button { color: white; background: none; border: none; padding: 14px; cursor: pointer; font-size: 16px; }
+    .navbar a:hover, .navbar button:hover { background: #555; }
+    .container { width: 80%; margin: auto; padding-top: 20px; }
+    .product-grid { display: flex; flex-wrap: wrap; gap: 15px; }
+    .product { border: 1px solid #ddd; padding: 10px; width: 220px; cursor: pointer; position: relative; }
+    .hidden { display: none; }
+    .modal { position: fixed; top: 20%; left: 35%; background: #fff; border: 1px solid #ccc; padding: 20px; z-index: 1000; width: 30%; box-shadow: 0 0 10px #000; }
+    .modal input, .modal select { width: 90%; margin: 5px 0; padding: 8px; }
+    #gif-banner { width: 100%; height: 150px; overflow: hidden; display: flex; }
+    #gif-banner img { width: 100%; height: 150px; object-fit: cover; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+    th { background: #f2f2f2; }
+    .popup { position: absolute; top: 100%; left: 0; width: 100%; background: white; border: 1px solid #aaa; z-index: 999; padding: 10px; display: none; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+    #cart-container { background: #fafafa; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+    #cart-container table { margin: 0; }
+    #cart-container input[type="number"] { width: 60px; }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <div id="gif-banner" aria-hidden="true">
+    <img src="https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExNWh4ZjY3ZW82OHNhMHZ1OHJ4bjBiejBmN3k2YzU5Mnd0ODV5dGhyYyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/cv0rLbvCdXBPjw0frO/giphy.gif" alt="E-Commerce Banner">
+  </div>
+
+  <div class="navbar" role="navigation" aria-label="Main navigation">
+    <a href="#" onclick="showSection('all-products')">All Products</a>
+    <a href="#" onclick="showSection('fashion')">Fashion</a>
+    <a href="#" onclick="showSection('electronics')">Electronics</a>
+    <a href="#" onclick="showSection('stationery')">Stationery</a>
+    <a href="#" onclick="showSection('cart')">My Cart</a>
+    <a href="#" onclick="showSection('orders')">My Orders</a>
+    <a href="#" onclick="showSection('about-us')">About Us</a>
+    <button onclick="openLogin()">Login</button>
+    <button onclick="openRegister()">Register</button>
+  </div>
+
+  <main id="main-content" class="container">
+    <div id="all-products" class="section" aria-label="All Products Section">
+      <h2>All Products</h2>
+      <select onchange="applyFilter()">
+        <option value="">Sort by</option>
+        <option value="rating-desc">Rating (High to Low)</option>
+        <option value="price-asc">Price (Low to High)</option>
+        <option value="price-desc">Price (High to Low)</option>
+        <option value="delivery">Delivery Time (Fastest First)</option>
+      </select>
+      <div class="product-grid" id="product-list"></div>
+    </div>
+    <div id="fashion" class="section hidden" aria-label="Fashion Section">
+      <h2>Fashion</h2>
+      <div class="product-grid" id="fashion-list"></div>
+    </div>
+    <div id="electronics" class="section hidden" aria-label="Electronics Section">
+      <h2>Electronics</h2>
+      <div class="product-grid" id="electronics-list"></div>
+    </div>
+    <div id="stationery" class="section hidden" aria-label="Stationery Section">
+      <h2>Stationery</h2>
+      <div class="product-grid" id="stationery-list"></div>
+    </div>
+    <div id="cart" class="section hidden" aria-label="My Cart Section">
+      <h2>My Cart</h2>
+      <div id="cart-container"></div>
+
+      <div id="cart-updated" aria-live="polite" class="sr-only"></div>
+      <h3>Total: $<span id="total-price">0.00</span></h3>
+      <button onclick="showPaymentModal()">Proceed to Pay</button>
+    </div>
+    <div id="orders" class="section hidden" aria-label="My Orders Section">
+      <h2>My Orders</h2>
+      <div id="order-list"></div>
+    </div>
+    <div id="about-us" class="section hidden" aria-label="About Us Section">
+      <h2>About Us</h2>
+      <p>Welcome to our eCommerce store! Go and browse our Products by clicking here <a href="#" onclick="showSection('all-products')">Home</a></p>
+    </div>
+  </main>
+
+  <div id="login-modal" class="modal hidden" role="dialog" aria-labelledby="login-modal-title" aria-modal="true">
+    <h2 id="login-modal-title">Login</h2>
+    <input type="text" id="login-username" placeholder="Email or Username" aria-label="Email or Username">
+    <input type="password" id="login-password" placeholder="Password" aria-label="Password">
+    <button onclick="submitLogin()">Login</button>
+    <button onclick="closeModal('login-modal')" aria-label="Cancel Login">Cancel</button>
+  </div>
+
+  <div id="register-modal" class="modal hidden" role="dialog" aria-labelledby="register-modal-title" aria-modal="true">
+    <h2 id="register-modal-title">Register</h2>
+    <input type="text" id="reg-name" placeholder="Name" aria-label="Name">
+    <input type="text" id="reg-contact" placeholder="Contact Number" aria-label="Contact Number">
+    <input type="email" id="reg-email" placeholder="Email" aria-label="Email">
+    <input type="text" id="reg-username" placeholder="Username" aria-label="Username">
+    <input type="password" id="reg-password" placeholder="Password" aria-label="Password">
+    <button onclick="submitRegister()">Register</button>
+    <button onclick="closeModal('register-modal')" aria-label="Cancel Registration">Cancel</button>
+  </div>
+
+  <div id="payment-modal" class="modal hidden" role="dialog" aria-labelledby="payment-modal-title" aria-modal="true">
+    <h2 id="payment-modal-title">Payment</h2>
+    <input type="text" id="pay-address" placeholder="Address" aria-label="Address">
+    <input type="tel" id="pay-phone" placeholder="Phone Number" aria-label="Phone Number">
+    <select id="pay-mode" aria-label="Payment Mode">
+      <option value="Cash On Delivery">Cash On Delivery</option>
+      <option value="UPI">UPI</option>
+      <option value="Bank Transfer">Bank Transfer</option>
+    </select>
+    <button onclick="submitPayment()">Pay Now</button>
+    <button onclick="closeModal('payment-modal')" aria-label="Cancel Payment">Cancel</button>
+  </div>
+
+  <div id="product-modal" class="modal hidden" role="dialog" aria-labelledby="product-modal-title" aria-modal="true">
+  </div>
+
+  <script>
+    let users = [];
+    let cart = [], orders = [];
+    
+    const products = [
+      { id: 1, name: 'Shirt', category: 'fashion', price: 29, rating: 4.2, image: 'data:image/jpeg;base64,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', delivery: 4, description: 'A stylish and comfortable shirt perfect for all occasions.' },
+      { id: 2, name: 'Sneakers', category: 'fashion', price: 49, rating: 4.5, image: 'images/image.png', delivery: 3, description: 'Trendy sneakers with space-age comfort.' },
+      { id: 3, name: 'Jacket', category: 'fashion', price: 89, rating: 4.7, image: 'images/jack.png', delivery: 5, description: 'Warm and lightweight jacket with a modern cut.' },
+      { id: 4, name: 'Backpack', category: 'fashion', price: 35, rating: 4.1, image: 'images/bag.png', delivery: 4, description: 'Spacious and durable backpack with multiple compartments.' },
+      { id: 5, name: 'Meteor Socks', category: 'fashion', price: 12, rating: 4.0, image: 'images/socks.png', delivery: 3, description: 'Soft and breathable socks for daily wear.' },
+      { id: 6, name: 'Watch', category: 'electronics', price: 129, rating: 4.8, image: 'images/watch.png', delivery: 3, description: 'Smartwatch with fitness tracking and long battery life.' },
+      { id: 7, name: 'Charger', category: 'electronics', price: 19, rating: 4.4, image: 'data:image/png;base64,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', delivery: 2, description: 'Fast charger compatible with all devices.' },
+      { id: 8, name: 'Headphones', category: 'electronics', price: 59, rating: 4.6, image: 'images/head.png', delivery: 4, description: 'Noise-cancelling headphones with rich audio quality.' },
+      { id: 9, name: 'Speaker', category: 'electronics', price: 39, rating: 4.3, image: 'images/spea.png', delivery: 3, description: 'Portable Bluetooth speaker with powerful bass.' },
+      { id: 10, name: 'IPhone Charger', category: 'electronics', price: 25, rating: 4.1, image: 'images/icha.png', delivery: 5, description: 'Wireless charger with magnetic alignment.' },
+      { id: 11, name: 'Starlight Pen', category: 'stationery', price: 3, rating: 4.5, image: 'images/pen.png', delivery: 2, description: 'Smooth ink pen with ergonomic grip.' },
+      { id: 12, name: 'Notebook', category: 'stationery', price: 5, rating: 4.7, image: 'images/noteb.png', delivery: 2, description: 'Stylish notebook with premium paper quality.' },
+      { id: 13, name: 'Nova Eraser Set', category: 'stationery', price: 2, rating: 4.2, image: 'images/eraser.png', delivery: 3, description: 'High-quality erasers in assorted shapes.' },
+      { id: 14, name: 'Ruler', category: 'stationery', price: 1, rating: 4.0, image: 'images/ruler.png', delivery: 2, description: 'Durable plastic ruler with clear markings.' },
+      { id: 15, name: 'Highlighter', category: 'stationery', price: 4, rating: 4.6, image: 'images/high.png', delivery: 2, description: 'Vibrant highlighters for study and office use.' }
+    ];
+
+    function showSection(id) {
+      document.querySelectorAll('.section').forEach(section => section.classList.add('hidden'));
+      document.getElementById(id).classList.remove('hidden');
+      if(id === 'orders') { refreshOrders(); }
+    }
+
+    function displayProducts() {
+      const sortOption = document.querySelector("select").value;
+      let prod = [...products];
+      ['product-list', 'fashion-list', 'electronics-list', 'stationery-list'].forEach(id => document.getElementById(id).innerHTML = '');
+      prod.forEach(p => {
+        const html = `<div class='product' onclick="openProductDetails(${p.id})" onmouseenter="showPopup(event, ${p.id})" onmouseleave="hidePopup(${p.id})" tabindex="0" role="button" aria-label="Product: ${p.name}, Price: $${p.price}, Rating: ${p.rating} out of 5, Delivery in ${p.delivery} days">
+          <img src='${p.image}' alt='${p.name}' style="width:100%;">
+          <h4>${p.name}</h4>
+          <p>Price: $${p.price}</p>
+          <p>Rating: ${p.rating}</p>
+          <p>Delivers in ${p.delivery} days</p>
+          <input type="number" min="1" value="1" id="qty-${p.id}" style="width: 60px;" onclick="event.stopPropagation()" aria-label="Quantity for ${p.name}">
+          <br>
+          <button onclick='event.stopPropagation(); addToCart(${p.id})'>Add to Cart</button>
+          <div class="popup" id="popup-${p.id}" role="tooltip" aria-hidden="true">
+            <strong>${p.name}</strong><br>
+            ${p.description}<br>
+            Rating: ${p.rating}<br>
+            Delivery: ${p.delivery} days
+          </div>
+        </div>`;
+        document.getElementById("product-list").innerHTML += html;
+        if (p.category === "fashion") document.getElementById("fashion-list").innerHTML += html;
+        if (p.category === "electronics") document.getElementById("electronics-list").innerHTML += html;
+        if (p.category === "stationery") document.getElementById("stationery-list").innerHTML += html;
+      });
+    }
+
+    function showPopup(e, id) {
+      const popup = document.getElementById('popup-' + id);
+      popup.style.display = 'block';
+      popup.setAttribute('aria-hidden', 'false');
+    }
+
+    function hidePopup(id) {
+      const popup = document.getElementById('popup-' + id);
+      popup.style.display = 'none';
+      popup.setAttribute('aria-hidden', 'true');
+    }
+
+    function applyFilter() { displayProducts(); }
+
+    function addToCart(id) {
+      let qtyEl = document.querySelector('#product-list #qty-' + id) ||
+                  document.querySelector('#fashion-list #qty-' + id) ||
+                  document.querySelector('#electronics-list #qty-' + id) ||
+                  document.querySelector('#stationery-list #qty-' + id);
+      let qty = parseInt(qtyEl.value) || 1;
+      const item = products.find(p => p.id === id);
+      const existing = cart.find(p => p.id === id);
+      if (existing) {
+        existing.quantity += qty;
+      } else {
+        cart.push({ ...item, quantity: qty });
+      }
+      updateCart();
+      document.getElementById('cart-updated').innerText = item.name + " added to cart";
+    }
+
+    function updateCart() {
+      let html = "";
+      let total = 0;
+      if(cart.length === 0){
+        html = "<p>Your cart is empty.</p>";
+      } else {
+        html = `<table>
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Price ($)</th>
+              <th>Quantity</th>
+              <th>Subtotal ($)</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>`;
+        cart.forEach(item => {
+          total += item.price * item.quantity;
+          html += `<tr>
+            <td>${item.name}</td>
+            <td>${item.price}</td>
+            <td>
+              <input type="number" min="1" value="${item.quantity}" onchange="updateCartItemQuantity(${item.id}, this.value)" aria-label="Update quantity for ${item.name}">
+            </td>
+            <td>${(item.price * item.quantity).toFixed(2)}</td>
+            <td><button onclick="removeCartItem(${item.id})" aria-label="Remove ${item.name} from cart">Remove</button></td>
+          </tr>`;
+        });
+        html += `</tbody></table>`;
+      }
+      document.getElementById("cart-container").innerHTML = html;
+      document.getElementById("total-price").innerText = total.toFixed(2);
+    }
+
+    function updateCartItemQuantity(id, newQty) {
+      newQty = parseInt(newQty);
+      const item = cart.find(p => p.id === id);
+      if (item) {
+        if (newQty <= 0) {
+          cart = cart.filter(p => p.id !== id);
+        } else {
+          item.quantity = newQty;
+        }
+        updateCart();
+      }
+    }
+
+    function removeCartItem(id) {
+      cart = cart.filter(p => p.id !== id);
+      updateCart();
+    }
+
+    function openLogin() {
+      document.getElementById('login-modal').classList.remove('hidden');
+    }
+    function submitLogin() {
+      const username = document.getElementById('login-username').value.trim();
+      const password = document.getElementById('login-password').value;
+      const found = users.find(u => (u.username === username || u.email === username) && u.password === password);
+      if(found) {
+        alert("Login successful!");
+        closeModal('login-modal');
+      } else {
+        alert("Invalid credentials!");
+      }
+    }
+
+    function openRegister() {
+      document.getElementById('register-modal').classList.remove('hidden');
+    }
+    function submitRegister() {
+      const name = document.getElementById('reg-name').value.trim();
+      const contact = document.getElementById('reg-contact').value.trim();
+      const email = document.getElementById('reg-email').value.trim();
+      const username = document.getElementById('reg-username').value.trim();
+      const password = document.getElementById('reg-password').value;
+      if(name && contact && email && username && password) {
+        users.push({ name, contact, email, username, password });
+        alert("Registration successful!");
+        closeModal('register-modal');
+      } else {
+        alert("Please fill in all fields.");
+      }
+    }
+
+    function showPaymentModal() {
+      document.getElementById('payment-modal').classList.remove('hidden');
+    }
+    function submitPayment() {
+      const address = document.getElementById('pay-address').value.trim();
+      const phone = document.getElementById('pay-phone').value.trim();
+      const mode = document.getElementById('pay-mode').value;
+      if(!address || !phone) {
+        alert("Please fill in address and phone number.");
+        return;
+      }
+
+      cart.forEach(item => {
+        const randomDays = Math.floor(Math.random() * 7) + 1; 
+        const arrivalDate = new Date();
+        arrivalDate.setDate(arrivalDate.getDate() + randomDays);
+        orders.push({
+          product: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          total: (item.price * item.quantity).toFixed(2),
+          address: address,
+          arrival: arrivalDate.toDateString()
+        });
+      });
+      alert("Payment successful! Your order has been placed.");
+      cart = [];
+      updateCart();
+      closeModal('payment-modal');
+      showSection('orders');
+    }
+
+    function refreshOrders() {
+      if(orders.length === 0) {
+        document.getElementById('order-list').innerHTML = "<p>No orders to display.</p>";
+        return;
+      }
+      let html = `<table>
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Price ($)</th>
+            <th>Quantity</th>
+            <th>Total ($)</th>
+            <th>Address</th>
+            <th>Arrival Date</th>
+          </tr>
+        </thead>
+        <tbody>`;
+      orders.forEach(o => {
+        html += `<tr>
+          <td>${o.product}</td>
+          <td>${o.price}</td>
+          <td>${o.quantity}</td>
+          <td>${o.total}</td>
+          <td>${o.address}</td>
+          <td>${o.arrival}</td>
+        </tr>`;
+      });
+      html += `</tbody></table>`;
+      document.getElementById('order-list').innerHTML = html;
+    }
+
+    function openProductDetails(id) {
+      const product = products.find(p => p.id === id);
+      if(!product) return;
+      const modal = document.getElementById('product-modal');
+      modal.innerHTML = `
+        <button style="cursor:pointer; float:right;" onclick="closeModal('product-modal')" aria-label="Close Product Details">X</button>
+        <h2 id="product-modal-title">${product.name}</h2>
+        <img src='${product.image}' alt='${product.name}' style="width:100%;">
+        <p>${product.description}</p>
+        <p>Price: $${product.price}</p>
+        <p>Rating: ${product.rating}</p>
+        <p>Delivers in ${product.delivery} days</p>
+      `;
+      modal.classList.remove('hidden');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+    }
+
+    window.onload = displayProducts;
+  </script>
+</body>
+</html>
