@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>E-Commerce Website (includes Aria label)</title>
+  <title>E-Commerce Website</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
     .skip-link { position: absolute; left: -1000px; top: auto; width: 1px; height: 1px; overflow: hidden; }
@@ -13,7 +13,7 @@
     .navbar a:hover, .navbar button:hover { background: #555; }
     .container { width: 80%; margin: auto; padding-top: 20px; }
     .product-grid { display: flex; flex-wrap: wrap; gap: 15px; }
-    .product { border: 1px solid #ddd; padding: 10px; width: 220px; cursor: pointer; position: relative; }
+    .product { border: 1px solid #ddd; padding: 10px; width: 220px; position: relative; }
     .hidden { display: none; }
     .modal { position: fixed; top: 20%; left: 35%; background: #fff; border: 1px solid #ccc; padding: 20px; z-index: 1000; width: 30%; box-shadow: 0 0 10px #000; }
     .modal input, .modal select { width: 90%; margin: 5px 0; padding: 8px; }
@@ -29,6 +29,7 @@
   </style>
 </head>
 <body>
+  <!-- Skip link for keyboard users -->
   <a href="#main-content" class="skip-link">Skip to main content</a>
 
   <div id="gif-banner" aria-hidden="true">
@@ -47,10 +48,11 @@
     <button onclick="openRegister()">Register</button>
   </div>
 
+  <!-- Wrap main content in a landmark -->
   <main id="main-content" class="container">
     <div id="all-products" class="section" aria-label="All Products Section">
       <h2>All Products</h2>
-      <select onchange="applyFilter()">
+      <select onchange="applyFilter()" aria-label="Sort products">
         <option value="">Sort by</option>
         <option value="rating-desc">Rating (High to Low)</option>
         <option value="price-asc">Price (Low to High)</option>
@@ -74,7 +76,7 @@
     <div id="cart" class="section hidden" aria-label="My Cart Section">
       <h2>My Cart</h2>
       <div id="cart-container"></div>
-
+      <!-- Live region for dynamic cart updates -->
       <div id="cart-updated" aria-live="polite" class="sr-only"></div>
       <h3>Total: $<span id="total-price">0.00</span></h3>
       <button onclick="showPaymentModal()">Proceed to Pay</button>
@@ -89,6 +91,7 @@
     </div>
   </main>
 
+  <!-- Modals -->
   <div id="login-modal" class="modal hidden" role="dialog" aria-labelledby="login-modal-title" aria-modal="true">
     <h2 id="login-modal-title">Login</h2>
     <input type="text" id="login-username" placeholder="Email or Username" aria-label="Email or Username">
@@ -122,6 +125,7 @@
   </div>
 
   <div id="product-modal" class="modal hidden" role="dialog" aria-labelledby="product-modal-title" aria-modal="true">
+    <!-- Product details will be injected here -->
   </div>
 
   <script>
@@ -157,15 +161,18 @@
       let prod = [...products];
       ['product-list', 'fashion-list', 'electronics-list', 'stationery-list'].forEach(id => document.getElementById(id).innerHTML = '');
       prod.forEach(p => {
-        const html = `<div class='product' onclick="openProductDetails(${p.id})" onmouseenter="showPopup(event, ${p.id})" onmouseleave="hidePopup(${p.id})" tabindex="0" role="button" aria-label="Product: ${p.name}, Price: $${p.price}, Rating: ${p.rating} out of 5, Delivery in ${p.delivery} days">
-          <img src='${p.image}' alt='${p.name}' style="width:100%;">
-          <h4>${p.name}</h4>
-          <p>Price: $${p.price}</p>
-          <p>Rating: ${p.rating}</p>
-          <p>Delivers in ${p.delivery} days</p>
+        const html = `
+        <div class='product' onmouseenter="showPopup(event, ${p.id})" onmouseleave="hidePopup(${p.id})">
+          <a href="#" onclick="openProductDetails(${p.id}); return false;" aria-label="View details for ${p.name}">
+            <img src='${p.image}' alt='${p.name}' style="width:100%;">
+            <h4>${p.name}</h4>
+            <p>Price: $${p.price}</p>
+            <p>Rating: ${p.rating}</p>
+            <p>Delivers in ${p.delivery} days</p>
+          </a>
           <input type="number" min="1" value="1" id="qty-${p.id}" style="width: 60px;" onclick="event.stopPropagation()" aria-label="Quantity for ${p.name}">
           <br>
-          <button onclick='event.stopPropagation(); addToCart(${p.id})'>Add to Cart</button>
+          <button onclick='event.stopPropagation(); addToCart(${p.id})' aria-label="Add ${p.name} to Cart">Add to Cart</button>
           <div class="popup" id="popup-${p.id}" role="tooltip" aria-hidden="true">
             <strong>${p.name}</strong><br>
             ${p.description}<br>
@@ -208,6 +215,7 @@
         cart.push({ ...item, quantity: qty });
       }
       updateCart();
+      // Announce cart update
       document.getElementById('cart-updated').innerText = item.name + " added to cart";
     }
 
