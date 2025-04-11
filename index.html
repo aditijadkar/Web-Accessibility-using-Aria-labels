@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>E-Commerce Website</title>
+  <title>E-Commerce Website (includes Aria label)</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
     .skip-link { position: absolute; left: -1000px; top: auto; width: 1px; height: 1px; overflow: hidden; }
@@ -13,9 +13,18 @@
     .navbar a:hover, .navbar button:hover { background: #555; }
     .container { width: 80%; margin: auto; padding-top: 20px; }
     .product-grid { display: flex; flex-wrap: wrap; gap: 15px; }
-    .product { border: 1px solid #ddd; padding: 10px; width: 220px; position: relative; }
+    .product { border: 1px solid #ddd; padding: 10px; width: 220px; cursor: pointer; position: relative; }
     .hidden { display: none; }
-    .modal { position: fixed; top: 20%; left: 35%; background: #fff; border: 1px solid #ccc; padding: 20px; z-index: 1000; width: 30%; box-shadow: 0 0 10px #000; }
+    
+    .modal {
+      position: relative;         
+      margin: 20px auto;          
+      max-width: 500px;           
+      padding: 20px;
+      border: 1px solid #ccc;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      background: #fff;
+    }
     .modal input, .modal select { width: 90%; margin: 5px 0; padding: 8px; }
     #gif-banner { width: 100%; height: 150px; overflow: hidden; display: flex; }
     #gif-banner img { width: 100%; height: 150px; object-fit: cover; }
@@ -29,7 +38,6 @@
   </style>
 </head>
 <body>
-  <!-- Skip link for keyboard users -->
   <a href="#main-content" class="skip-link">Skip to main content</a>
 
   <div id="gif-banner" aria-hidden="true">
@@ -48,11 +56,11 @@
     <button onclick="openRegister()">Register</button>
   </div>
 
-  <!-- Wrap main content in a landmark -->
   <main id="main-content" class="container">
     <div id="all-products" class="section" aria-label="All Products Section">
       <h2>All Products</h2>
-      <select onchange="applyFilter()" aria-label="Sort products">
+      
+      <select onchange="applyFilter()">
         <option value="">Sort by</option>
         <option value="rating-desc">Rating (High to Low)</option>
         <option value="price-asc">Price (Low to High)</option>
@@ -76,7 +84,7 @@
     <div id="cart" class="section hidden" aria-label="My Cart Section">
       <h2>My Cart</h2>
       <div id="cart-container"></div>
-      <!-- Live region for dynamic cart updates -->
+
       <div id="cart-updated" aria-live="polite" class="sr-only"></div>
       <h3>Total: $<span id="total-price">0.00</span></h3>
       <button onclick="showPaymentModal()">Proceed to Pay</button>
@@ -89,44 +97,44 @@
       <h2>About Us</h2>
       <p>Welcome to our eCommerce store! Go and browse our Products by clicking here <a href="#" onclick="showSection('all-products')">Home</a></p>
     </div>
+
+    <div id="login-modal" class="modal hidden" role="dialog" aria-labelledby="login-modal-title" aria-modal="true" tabindex="0">
+      <h2 id="login-modal-title">Login</h2>
+      <input type="text" id="login-username" placeholder="Email or Username" aria-label="Email or Username">
+      <input type="password" id="login-password" placeholder="Password" aria-label="Password">
+      <button onclick="submitLogin()">Login</button>
+      <button onclick="closeModal('login-modal')" aria-label="Cancel Login">Cancel</button>
+    </div>
+
+    <div id="register-modal" class="modal hidden" role="dialog" aria-labelledby="register-modal-title" aria-modal="true" tabindex="0">
+      <h2 id="register-modal-title">Register</h2>
+      <input type="text" id="reg-name" placeholder="Name" aria-label="Name">
+      <input type="text" id="reg-contact" placeholder="Contact Number" aria-label="Contact Number">
+      <input type="email" id="reg-email" placeholder="Email" aria-label="Email">
+      <input type="text" id="reg-username" placeholder="Username" aria-label="Username">
+      <input type="password" id="reg-password" placeholder="Password" aria-label="Password">
+      <button onclick="submitRegister()">Register</button>
+      <button onclick="closeModal('register-modal')" aria-label="Cancel Registration">Cancel</button>
+    </div>
+
+    <div id="payment-modal" class="modal hidden" role="dialog" aria-labelledby="payment-modal-title" aria-modal="true" tabindex="0">
+      <h2 id="payment-modal-title">Payment</h2>
+      <input type="text" id="pay-address" placeholder="Address" aria-label="Address">
+      <input type="tel" id="pay-phone" placeholder="Phone Number" aria-label="Phone Number">
+      <select id="pay-mode" aria-label="Payment Mode">
+        <option value="Cash On Delivery">Cash On Delivery</option>
+        <option value="UPI">UPI</option>
+        <option value="Bank Transfer">Bank Transfer</option>
+      </select>
+      <button onclick="submitPayment()">Pay Now</button>
+      <button onclick="closeModal('payment-modal')" aria-label="Cancel Payment">Cancel</button>
+    </div>
+
+    <!-- Display product details (description) as an inline section -->
+    <div id="product-modal" class="modal hidden" role="dialog" aria-labelledby="product-modal-title" aria-modal="true" tabindex="0">
+    </div>
   </main>
 
-  <!-- Modals -->
-  <div id="login-modal" class="modal hidden" role="dialog" aria-labelledby="login-modal-title" aria-modal="true">
-    <h2 id="login-modal-title">Login</h2>
-    <input type="text" id="login-username" placeholder="Email or Username" aria-label="Email or Username">
-    <input type="password" id="login-password" placeholder="Password" aria-label="Password">
-    <button onclick="submitLogin()">Login</button>
-    <button onclick="closeModal('login-modal')" aria-label="Cancel Login">Cancel</button>
-  </div>
-
-  <div id="register-modal" class="modal hidden" role="dialog" aria-labelledby="register-modal-title" aria-modal="true">
-    <h2 id="register-modal-title">Register</h2>
-    <input type="text" id="reg-name" placeholder="Name" aria-label="Name">
-    <input type="text" id="reg-contact" placeholder="Contact Number" aria-label="Contact Number">
-    <input type="email" id="reg-email" placeholder="Email" aria-label="Email">
-    <input type="text" id="reg-username" placeholder="Username" aria-label="Username">
-    <input type="password" id="reg-password" placeholder="Password" aria-label="Password">
-    <button onclick="submitRegister()">Register</button>
-    <button onclick="closeModal('register-modal')" aria-label="Cancel Registration">Cancel</button>
-  </div>
-
-  <div id="payment-modal" class="modal hidden" role="dialog" aria-labelledby="payment-modal-title" aria-modal="true">
-    <h2 id="payment-modal-title">Payment</h2>
-    <input type="text" id="pay-address" placeholder="Address" aria-label="Address">
-    <input type="tel" id="pay-phone" placeholder="Phone Number" aria-label="Phone Number">
-    <select id="pay-mode" aria-label="Payment Mode">
-      <option value="Cash On Delivery">Cash On Delivery</option>
-      <option value="UPI">UPI</option>
-      <option value="Bank Transfer">Bank Transfer</option>
-    </select>
-    <button onclick="submitPayment()">Pay Now</button>
-    <button onclick="closeModal('payment-modal')" aria-label="Cancel Payment">Cancel</button>
-  </div>
-
-  <div id="product-modal" class="modal hidden" role="dialog" aria-labelledby="product-modal-title" aria-modal="true">
-  </div>
-  <footer><h2>This is used for testing web accessibilty checker tools and screen recorders like nvda</h2></footer>
   <script>
     let users = [];
     let cart = [], orders = [];
@@ -149,29 +157,32 @@
       { id: 15, name: 'Highlighter', category: 'stationery', price: 4, rating: 4.6, image: 'images/high.png', delivery: 2, description: 'Vibrant highlighters for study and office use.' }
     ];
 
-    function showSection(id) {
-      document.querySelectorAll('.section').forEach(section => section.classList.add('hidden'));
-      document.getElementById(id).classList.remove('hidden');
-      if(id === 'orders') { refreshOrders(); }
-    }
-
     function displayProducts() {
       const sortOption = document.querySelector("select").value;
       let prod = [...products];
-      ['product-list', 'fashion-list', 'electronics-list', 'stationery-list'].forEach(id => document.getElementById(id).innerHTML = '');
+      if (sortOption === 'rating-desc') {
+         prod.sort((a, b) => b.rating - a.rating);
+      } else if (sortOption === 'price-asc') {
+         prod.sort((a, b) => a.price - b.price);
+      } else if (sortOption === 'price-desc') {
+         prod.sort((a, b) => b.price - a.price);
+      } else if (sortOption === 'delivery') {
+         prod.sort((a, b) => a.delivery - b.delivery);
+      }
+      ['product-list', 'fashion-list', 'electronics-list', 'stationery-list'].forEach(id => {
+        document.getElementById(id).innerHTML = '';
+      });
       prod.forEach(p => {
-        const html = `
-        <div class='product' onmouseenter="showPopup(event, ${p.id})" onmouseleave="hidePopup(${p.id})">
-          <a href="#" onclick="openProductDetails(${p.id}); return false;" aria-label="View details for ${p.name}">
-            <img src='${p.image}' alt='${p.name}' style="width:100%;">
-            <h4>${p.name}</h4>
-            <p>Price: $${p.price}</p>
-            <p>Rating: ${p.rating}</p>
-            <p>Delivers in ${p.delivery} days</p>
-          </a>
+        const html = `<div class='product' onclick="openProductDetails(${p.id})" onmouseenter="showPopup(event, ${p.id})" onmouseleave="hidePopup(${p.id})" tabindex="0" role="button" aria-label="Product: ${p.name}, Price: $${p.price}, Rating: ${p.rating} out of 5, Delivery in ${p.delivery} days">
+          <img src='${p.image}' alt='${p.name}' style="width:100%;">
+          <h4>${p.name}</h4>
+          <p>Price: $${p.price}</p>
+          <p>Rating: ${p.rating}</p>
+          <p>Delivers in ${p.delivery} days</p>
           <input type="number" min="1" value="1" id="qty-${p.id}" style="width: 60px;" onclick="event.stopPropagation()" aria-label="Quantity for ${p.name}">
           <br>
-          <button onclick='event.stopPropagation(); addToCart(${p.id})' aria-label="Add ${p.name} to Cart">Add to Cart</button>
+          <button onclick='event.stopPropagation(); addToCart(${p.id}, this)'>Add to Cart</button>
+          <a href="#cart" onclick="showSection('cart'); event.stopPropagation();">Go to cart</a>
           <div class="popup" id="popup-${p.id}" role="tooltip" aria-hidden="true">
             <strong>${p.name}</strong><br>
             ${p.description}<br>
@@ -200,7 +211,7 @@
 
     function applyFilter() { displayProducts(); }
 
-    function addToCart(id) {
+    function addToCart(id, btn) {
       let qtyEl = document.querySelector('#product-list #qty-' + id) ||
                   document.querySelector('#fashion-list #qty-' + id) ||
                   document.querySelector('#electronics-list #qty-' + id) ||
@@ -214,8 +225,8 @@
         cart.push({ ...item, quantity: qty });
       }
       updateCart();
-      // Announce cart update
       document.getElementById('cart-updated').innerText = item.name + " added to cart";
+      if(btn) { btn.innerText = "Added to Cart"; }
     }
 
     function updateCart() {
@@ -271,41 +282,60 @@
       updateCart();
     }
 
-    function openLogin() {
-      document.getElementById('login-modal').classList.remove('hidden');
-    }
-    function submitLogin() {
-      const username = document.getElementById('login-username').value.trim();
-      const password = document.getElementById('login-password').value;
-      const found = users.find(u => (u.username === username || u.email === username) && u.password === password);
-      if(found) {
-        alert("Login successful!");
-        closeModal('login-modal');
-      } else {
-        alert("Invalid credentials!");
+    function trapModal(modalId) {
+      const modal = document.getElementById(modalId);
+      if(modal) {
+        modal.focus();
+        modal.addEventListener('keydown', function handler(e) {
+          if (e.key === 'Escape') {
+            closeModal(modalId);
+            modal.removeEventListener('keydown', handler);
+          }
+        });
       }
     }
+
+    function openLogin() {
+      document.getElementById('login-modal').classList.remove('hidden');
+      trapModal('login-modal'); // sets focus and trap
+    }
+    function submitLogin() {
+  const username = document.getElementById('login-username').value.trim();
+  const password = document.getElementById('login-password').value;
+  const found = users.find(u => (u.username === username || u.email === username) && u.password === password);
+  if(found) {
+    alert("Login successful!");
+    closeModal('login-modal');
+    showSection('main-content'); 
+  } else {
+    alert("Invalid credentials!");
+  }
+}
+
 
     function openRegister() {
       document.getElementById('register-modal').classList.remove('hidden');
+      trapModal('register-modal'); 
     }
     function submitRegister() {
-      const name = document.getElementById('reg-name').value.trim();
-      const contact = document.getElementById('reg-contact').value.trim();
-      const email = document.getElementById('reg-email').value.trim();
-      const username = document.getElementById('reg-username').value.trim();
-      const password = document.getElementById('reg-password').value;
-      if(name && contact && email && username && password) {
-        users.push({ name, contact, email, username, password });
-        alert("Registration successful!");
-        closeModal('register-modal');
-      } else {
-        alert("Please fill in all fields.");
-      }
-    }
+  const name = document.getElementById('reg-name').value.trim();
+  const contact = document.getElementById('reg-contact').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const username = document.getElementById('reg-username').value.trim();
+  const password = document.getElementById('reg-password').value;
+  if(name && contact && email && username && password) {
+    users.push({ name, contact, email, username, password });
+    alert("Registration successful!");
+    closeModal('register-modal');
+    openLogin(); 
+  } else {
+    alert("Please fill in all fields.");
+  }
+}
 
     function showPaymentModal() {
       document.getElementById('payment-modal').classList.remove('hidden');
+      trapModal('payment-modal'); 
     }
     function submitPayment() {
       const address = document.getElementById('pay-address').value.trim();
@@ -381,15 +411,20 @@
         <p>Delivers in ${product.delivery} days</p>
       `;
       modal.classList.remove('hidden');
+      trapModal('product-modal'); 
     }
 
     function closeModal(id) {
       document.getElementById(id).classList.add('hidden');
     }
 
+    function showSection(id) {
+      document.querySelectorAll('.section').forEach(section => section.classList.add('hidden'));
+      document.getElementById(id).classList.remove('hidden');
+      if(id === 'orders') { refreshOrders(); }
+    }
+
     window.onload = displayProducts;
   </script>
-  <footer><p style="background-color:yellow">This is used for testing web accessibilty checker tools and screen recorders like nvda</p></footer>
-
 </body>
 </html>
