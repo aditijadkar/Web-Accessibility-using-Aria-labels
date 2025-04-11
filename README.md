@@ -62,5 +62,5 @@ Used in modals to indicate that the user must interact with the modal before ret
 ### 4. `aria-live="polite"`
 Announces updates (like cart changes) to screen readers without interrupting the user.
 
-### aria-hidden="true" / "false"
+### 5. aria-hidden="true" / "false"
 Controls visibility of elements for assistive technologies (e.g., tooltips or modals).
